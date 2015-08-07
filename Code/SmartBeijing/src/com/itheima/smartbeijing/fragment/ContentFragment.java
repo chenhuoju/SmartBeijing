@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
@@ -111,7 +110,7 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 		public Object instantiateItem(ViewGroup container, int position)
 		{
 			// 预加载
-			Log.e(TAG, "加载第" + position + "页");
+			// Log.e(TAG, "加载第" + position + "页");
 
 			TabBasePager pager = mPagerList.get(position);
 			View view = pager.getRootView();
@@ -131,7 +130,7 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 		@Override
 		public void destroyItem(ViewGroup container, int position, Object object)
 		{
-			Log.e(TAG, "销毁第" + position + "页");
+			// Log.e(TAG, "销毁第" + position + "页");
 
 			container.removeView((View) object);
 		}
