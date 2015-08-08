@@ -168,7 +168,7 @@ public class TabNewsCenterPager extends TabBasePager
 			switch (bean.type)
 			{
 				case 1:// 新闻
-					menuPager = new NewCenterNewsMenu(mContext);
+					menuPager = new NewCenterNewsMenu(mContext, bean);
 					break;
 				case 10:// 专题
 					menuPager = new NewCenterTopicMenu(mContext);
