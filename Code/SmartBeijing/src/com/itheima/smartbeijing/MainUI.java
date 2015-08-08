@@ -52,7 +52,7 @@ public class MainUI extends SlidingFragmentActivity
 		// 指的是菜单的边缘到屏幕边缘的距离
 		// menu.setBehindOffset(180);
 		// 菜单宽度
-		menu.setBehindWidth(180);// 120
+		menu.setBehindWidth(240);// 120
 		// 设置SlidingMenu滑动模式:全屏拉出TOUCHMODE_FULLSCREEN(TOUCHMODE_MARGIN,TOUCHMODE_NONE)
 		menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
 
@@ -79,5 +79,16 @@ public class MainUI extends SlidingFragmentActivity
 
 		// 提交事务
 		transaction.commit();
+	}
+
+	/**
+	 * 获取左侧菜单数据
+	 * 
+	 * @return
+	 */
+	public LeftMenuFragment getLeftFragment()
+	{
+		FragmentManager fm = getSupportFragmentManager();
+		return (LeftMenuFragment) fm.findFragmentByTag(TAG_LEFT_CONTENT);
 	}
 }

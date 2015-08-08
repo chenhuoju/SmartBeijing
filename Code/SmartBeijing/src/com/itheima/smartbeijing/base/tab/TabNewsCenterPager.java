@@ -1,16 +1,24 @@
 package com.itheima.smartbeijing.base.tab;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.itheima.smartbeijing.MainUI;
+import com.itheima.smartbeijing.base.NewCenterBaseMenu;
 import com.itheima.smartbeijing.base.TabBasePager;
+import com.itheima.smartbeijing.bean.NewsCenterBean;
+import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
+import com.itheima.smartbeijing.fragment.LeftMenuFragment;
+import com.itheima.smartbeijing.utils.Constans;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 
 /**
  * @包名:com.itheima.smartbeijing.base.tab
@@ -24,7 +32,14 @@ import com.itheima.smartbeijing.base.TabBasePager;
 public class TabNewsCenterPager extends TabBasePager
 {
 
-	private List<TextView>	mPagerList;
+	protected static final String			TAG	= "TabNewsCenterPager";
+
+	// private List<TextView> mPagerList;
+	private List<NewCenterBaseMenu>			mPagerList;				// 菜单页面的集合
+
+	private NewsCenterBean					mData;						// 页面对象的数据
+
+	private List<NewsCenterMenuListBean>	mMenuData;					// 菜单对应的数据集合
 
 	public TabNewsCenterPager(Context context) {
 		super(context);
@@ -49,25 +64,86 @@ public class TabNewsCenterPager extends TabBasePager
 		// mContentContainer.addView(tv, params);
 
 		// 通过网络去获取数据，将数据加载到页面上来
-		// 模拟死数据
-		mPagerList = new ArrayList<TextView>();
-		for (int i = 0; i < 4; i++)
-		{
-			TextView tv = new TextView(mContext);
-			tv.setText("菜单" + (i + 1) + "的页面");
+		HttpUtils utils = new HttpUtils();
 
-			mPagerList.add(tv);
-		}
+		// RequestParams params = new RequestParams();
+		// 1.消息头
+		// params.addHeader("", "");
+		// 2.请求参数
+		// post请求:
+		// NameValuePair nameValuePair = new BasicNameValuePair("", "");
+		// params.addBodyParameter(nameValuePair);
+		// get请求:
+		// NameValuePair nameValuePair = new BasicNameValuePair("name", "chj");
+		// params.addQueryStringParameter(nameValuePair);
+		// utils.send(HttpMethod.GET, Constans.NEW_CENTER_URL, params,
+		// callBack);
+
+		utils.send(HttpMethod.GET, Constans.NEW_CENTER_URL, new RequestCallBack<String>() {
+
+			// 访问网络成功后的回调
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				// 取出结果值
+				String result = responseInfo.result;
+
+				Log.e(TAG, "访问网络成功:" + result);
+
+				// 对数据进行解析，并且将结果展示到页面上
+				processData(result);
+			}
+
+			// 访问网络成失败后的回调
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				error.printStackTrace();
+				Log.e(TAG, "访问网络成功:" + msg);
+			}
+		});
+
+		// 模拟死数据
+		// mPagerList = new ArrayList<TextView>();
+		// for (int i = 0; i < 4; i++)
+		// {
+		// TextView tv = new TextView(mContext);
+		// tv.setText("菜单" + (i + 1) + "的页面");
+		//
+		// mPagerList.add(tv);
+		// }
 
 		// 设置内容区域视图的展示默认值
-		switchPager(0);
+		// switchPager(0);
 
+	}
+
+	/**
+	 * jsons数据解析,同时把数据显示至页面上
+	 * 
+	 * @Gson类:toJson方法:将java对象变成json串;fromJson方法:将json串变成java对象
+	 */
+	protected void processData(String json)
+	{
+		// 1.json串的解析
+		Gson gson = new Gson();
+		mData = gson.fromJson(json, NewsCenterBean.class);
+		mMenuData = mData.data;
+
+		// 2.将数据展示到页面上
+		// 2.1 展示到左侧菜单
+		// 获取左侧菜单的fragment
+		MainUI ui = (MainUI) mContext;
+		LeftMenuFragment leftFragment = ui.getLeftFragment();
+		// 设置数据
+		leftFragment.setMenuData(mMenuData);
+
+		// 2.2 展示到内容区域 TODO:
 	}
 
 	/**
 	 * 设置内容区域视图的展示
 	 * 
-	 * @param i
 	 */
 	public void switchPager(int i)
 	{
@@ -75,13 +151,13 @@ public class TabNewsCenterPager extends TabBasePager
 		mContentContainer.removeAllViews();
 
 		// TODO:伪代码，用来展示用的
-		TextView tv = mPagerList.get(i);
-		tv.setTextColor(Color.RED);
-		tv.setTextSize(24);
-		tv.setGravity(Gravity.CENTER);
-
-		LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-												LayoutParams.MATCH_PARENT);
-		mContentContainer.addView(tv, params);
+		// TextView tv = mPagerList.get(i);
+		// tv.setTextColor(Color.RED);
+		// tv.setTextSize(24);
+		// tv.setGravity(Gravity.CENTER);
+		//
+		// LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+		// LayoutParams.MATCH_PARENT);
+		// mContentContainer.addView(tv, params);
 	}
 }

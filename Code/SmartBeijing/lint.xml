@@ -3,4 +3,7 @@
     <issue id="NewApi" severity="ignore">
         <ignore path="src/com/itheima/wisdombeijing/GuideUI.java" />
     </issue>
+    <issue id="ShowToast">
+        <ignore path="src/com/itheima/smartbeijing/base/tab/TabNewsCenterPager.java" />
+    </issue>
 </lint>
