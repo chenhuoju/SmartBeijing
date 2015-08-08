@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -18,6 +19,7 @@ import com.itheima.smartbeijing.base.newscentermenu.NewCenterTopicMenu;
 import com.itheima.smartbeijing.bean.NewsCenterBean;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
 import com.itheima.smartbeijing.fragment.LeftMenuFragment;
+import com.itheima.smartbeijing.utils.CacheUtils;
 import com.itheima.smartbeijing.utils.Constans;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -68,6 +70,15 @@ public class TabNewsCenterPager extends TabBasePager
 		// LayoutParams.MATCH_PARENT);
 		// mContentContainer.addView(tv, params);
 
+		// 读取缓存数据
+		String json = CacheUtils.getString(mContext, Constans.NEW_CENTER_URL);
+		if (!TextUtils.isEmpty(json))
+		{
+			// 有缓冲数据
+			Log.e(TAG, "读取本地缓存");
+			processData(json);
+		}
+
 		// 通过网络去获取数据，将数据加载到页面上来
 		HttpUtils utils = new HttpUtils();
 
@@ -94,6 +105,11 @@ public class TabNewsCenterPager extends TabBasePager
 				String result = responseInfo.result;
 
 				Log.e(TAG, "访问网络成功:" + result);
+
+				// 缓存数据
+				CacheUtils.setString(mContext, Constans.NEW_CENTER_URL, result);
+
+				Log.e(TAG, "读取网络缓存");
 
 				// 对数据进行解析，并且将结果展示到页面上
 				processData(result);

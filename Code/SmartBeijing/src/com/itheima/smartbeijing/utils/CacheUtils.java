@@ -72,4 +72,47 @@ public class CacheUtils
 		editor.putBoolean(key, value);
 		editor.commit();
 	}
+
+	/**
+	 * 获取String类型的缓存数据,没有的话默认值是""
+	 * 
+	 * @param context
+	 * @param key
+	 * @return
+	 */
+	public static String getString(Context context, String key)
+	{
+		SharedPreferences sp = getPreferences(context);
+		return sp.getString(key, "");
+	}
+
+	/**
+	 * 获取String的缓存数据
+	 * 
+	 * @param context
+	 * @param key
+	 * @param defValue
+	 *            : 没有时的默认值
+	 * @return
+	 */
+	public static String getString(Context context, String key, String defValue)
+	{
+		SharedPreferences sp = getPreferences(context);
+		return sp.getString(key, defValue);
+	}
+
+	/**
+	 * 设置String类型的缓存
+	 * 
+	 * @param context
+	 * @param key
+	 * @param value
+	 */
+	public static void setString(Context context, String key, String value)
+	{
+		SharedPreferences sp = getPreferences(context);
+		Editor editor = sp.edit();
+		editor.putString(key, value);
+		editor.commit();
+	}
 }
