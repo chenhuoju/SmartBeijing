@@ -16,9 +16,9 @@ import com.itheima.smartbeijing.base.NewCenterBaseMenu;
  * @时间:2015-8-7 下午8:02:58
  * 
  * 
- * @描述:新闻中心-->页面中-->主图菜单中对应的内容页面
+ * @描述:新闻中心-->页面中-->组图菜单中对应的内容页面
  * 
- * @SVN版本号:$Rev: 12 $
+ * @SVN版本号:$Rev: 14 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
@@ -35,7 +35,7 @@ public class NewCenterPicMenu extends NewCenterBaseMenu
 	{
 		TextView tv = new TextView(mContext);
 
-		tv.setText("主图页面的内容区域");
+		tv.setText("组图页面的内容区域");
 		tv.setTextSize(24);
 		tv.setTextColor(Color.RED);
 		tv.setGravity(Gravity.CENTER);

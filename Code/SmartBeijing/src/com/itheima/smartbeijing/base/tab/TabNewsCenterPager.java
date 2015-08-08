@@ -1,5 +1,6 @@
 package com.itheima.smartbeijing.base.tab;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -10,6 +11,10 @@ import com.google.gson.Gson;
 import com.itheima.smartbeijing.MainUI;
 import com.itheima.smartbeijing.base.NewCenterBaseMenu;
 import com.itheima.smartbeijing.base.TabBasePager;
+import com.itheima.smartbeijing.base.newscentermenu.NewCenterInteractMenu;
+import com.itheima.smartbeijing.base.newscentermenu.NewCenterNewsMenu;
+import com.itheima.smartbeijing.base.newscentermenu.NewCenterPicMenu;
+import com.itheima.smartbeijing.base.newscentermenu.NewCenterTopicMenu;
 import com.itheima.smartbeijing.bean.NewsCenterBean;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
 import com.itheima.smartbeijing.fragment.LeftMenuFragment;
@@ -27,7 +32,7 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
  * @时间:2015-8-7 上午10:13:38
  * 
  * 
- * @描述:主页界面中tab对应的新闻中心设置
+ * @描述:主页界面中tab对应的新闻中心设置，用来管理菜单页面的显示
  */
 public class TabNewsCenterPager extends TabBasePager
 {
@@ -139,25 +144,78 @@ public class TabNewsCenterPager extends TabBasePager
 		leftFragment.setMenuData(mMenuData);
 
 		// 2.2 展示到内容区域 TODO:
+		mPagerList = new ArrayList<NewCenterBaseMenu>();
+		for (int i = 0; i < mMenuData.size(); i++)
+		{
+			NewsCenterMenuListBean bean = mMenuData.get(i);
+			NewCenterBaseMenu menuPager = null;
+			switch (bean.type)
+			{
+				case 1:// 新闻
+					menuPager = new NewCenterNewsMenu(mContext);
+					break;
+				case 10:// 专题
+					menuPager = new NewCenterTopicMenu(mContext);
+					break;
+				case 2:// 组图
+					menuPager = new NewCenterPicMenu(mContext);
+					break;
+				case 3:// 互动
+					menuPager = new NewCenterInteractMenu(mContext);
+					break;
+				default:
+					break;
+			}
+			mPagerList.add(menuPager);
+		}
+
+		// 设置内容区域视图的展示默认值
+		switchMenuPager(0);
 	}
 
 	/**
-	 * 设置内容区域视图的展示
+	 * 设置内容区域视图的展示---->测试使用的
 	 * 
 	 */
-	public void switchPager(int i)
+	// private void switchPager(int i)
+	// {
+	// // 清空内容的数据
+	// mContentContainer.removeAllViews();
+	//
+	// // TODO:伪代码，用来展示用的
+	// // TextView tv = mPagerList.get(i);
+	// // tv.setTextColor(Color.RED);
+	// // tv.setTextSize(24);
+	// // tv.setGravity(Gravity.CENTER);
+	// //
+	// // LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+	// // LayoutParams.MATCH_PARENT);
+	// // mContentContainer.addView(tv, params);
+	//
+	// Log.e(TAG, "切换到第" + i + "菜单");
+	//
+	// }
+
+	@Override
+	public void switchMenuPager(int position)
 	{
+		Log.e(TAG, "切换到第" + position + "菜单");
+
 		// 清空内容的数据
 		mContentContainer.removeAllViews();
 
-		// TODO:伪代码，用来展示用的
-		// TextView tv = mPagerList.get(i);
-		// tv.setTextColor(Color.RED);
-		// tv.setTextSize(24);
-		// tv.setGravity(Gravity.CENTER);
-		//
-		// LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-		// LayoutParams.MATCH_PARENT);
-		// mContentContainer.addView(tv, params);
+		// 设置title显示
+		NewsCenterMenuListBean bean = mMenuData.get(position);
+		mTvTitle.setText(bean.title);
+
+		// 页面切换
+		NewCenterBaseMenu menuPager = mPagerList.get(position);
+		View rootView = menuPager.getRootView();
+
+		mContentContainer.addView(rootView);
+
+		// 加载数据
+		menuPager.initData();
+
 	}
 }

@@ -95,4 +95,12 @@ public abstract class TabBasePager implements OnClickListener
 		// 如果slidingMenu是打开的，那么就关闭，否则相反
 		menu.toggle();
 	}
+
+	/**
+	 * 菜单切换的方法，子类如果要实现菜单切换，就需要复习这个方法
+	 * @param position
+	 */
+	public void switchMenuPager(int position)
+	{
+	}
 }

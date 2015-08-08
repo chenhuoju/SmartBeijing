@@ -5,13 +5,17 @@ import java.util.List;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.itheima.smartbeijing.MainUI;
 import com.itheima.smartbeijing.R;
 import com.itheima.smartbeijing.base.BaseFragment;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 /**
  * @包名:com.itheima.wisdombeijing.fragment
@@ -22,12 +26,13 @@ import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
  * 
  * @描述:左侧菜单
  */
-public class LeftMenuFragment extends BaseFragment
+public class LeftMenuFragment extends BaseFragment implements OnItemClickListener
 {
 
 	private List<NewsCenterMenuListBean>	mMenuDatas;	// 菜单对应的数据
 	private ListView						mListView;		// 页面的listView
 	private int								mCurrentItem;	// 当前选中项
+	private LeftMenuFragmentAdapter			mMenuadapter;	// 创建自定义左侧菜单适配器对象
 
 	@Override
 	protected View initView()
@@ -47,6 +52,9 @@ public class LeftMenuFragment extends BaseFragment
 		mListView.setCacheColorHint(android.R.color.transparent);// 去掉缓存颜色
 		mListView.setSelector(android.R.color.transparent);// 去掉selector
 
+		// 给listView设置item点击事件
+		mListView.setOnItemClickListener(this);
+
 		return mListView;
 	}
 
@@ -64,7 +72,8 @@ public class LeftMenuFragment extends BaseFragment
 		this.mMenuDatas = datas;
 
 		// 数据设置-->adapter-->list
-		mListView.setAdapter(new LeftMenuFragmentAdapter());
+		mMenuadapter = new LeftMenuFragmentAdapter();
+		mListView.setAdapter(mMenuadapter);
 	}
 
 	/**
@@ -128,5 +137,30 @@ public class LeftMenuFragment extends BaseFragment
 			// 返回显示数据View
 			return tv;
 		}
+	}
+
+	/**
+	 * listView中item的点击事件
+	 */
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+	{
+		// 不做处理
+		if (mCurrentItem == position) { return; }
+
+		// 1.选中对应的项
+		this.mCurrentItem = position;
+		// UI更新
+		mMenuadapter.notifyDataSetChanged();
+
+		MainUI ui = (MainUI) mActivity;
+
+		// 2.收起菜单
+		SlidingMenu slidingMenu = ui.getSlidingMenu();
+		slidingMenu.toggle();
+
+		// 3.右侧内容区域改变 TODO
+		ContentFragment contentFragment = ui.getContentFragment();
+		contentFragment.swithcMenuPager(mCurrentItem);
 	}
 }

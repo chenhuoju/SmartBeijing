@@ -30,7 +30,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * @时间:2015-8-6 下午7:58:03
  * 
  * 
- * @描述:主页内容区域
+ * @描述:主页内容区域，用来管理Tab页面的切换
  */
 public class ContentFragment extends BaseFragment implements OnCheckedChangeListener
 {
@@ -43,6 +43,8 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 	private RadioGroup			mRadioGroup;				// 底部容器radioGroup
 
 	private List<TabBasePager>	mPagerList;				// 页面数据
+
+	private int					mCurrentIndex;
 
 	@Override
 	protected View initView()
@@ -81,6 +83,7 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 		mRadioGroup.setOnCheckedChangeListener(this);
 
 		// 设置初始化选中的界面,就是默认选中的界面
+		mCurrentIndex = 0;
 		mRadioGroup.check(R.id.tab_home);
 	}
 
@@ -146,28 +149,27 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 	@Override
 	public void onCheckedChanged(RadioGroup group, int checkedId)
 	{
-		int currentIndex = -1;
 		switch (checkedId)
 		{
 			case R.id.tab_home:// 首页
-				currentIndex = 0;
+				mCurrentIndex = 0;
 				// 设置侧滑菜单不可见
 				setSlideMenuTouchEnable(false);
 				break;
 			case R.id.tab_newscenter:// 新闻
 				setSlideMenuTouchEnable(true);
-				currentIndex = 1;
+				mCurrentIndex = 1;
 				break;
 			case R.id.tab_smartserver:// 智慧服务
-				currentIndex = 2;
+				mCurrentIndex = 2;
 				setSlideMenuTouchEnable(true);
 				break;
 			case R.id.tab_gov:// 政务
-				currentIndex = 3;
+				mCurrentIndex = 3;
 				setSlideMenuTouchEnable(true);
 				break;
 			case R.id.tab_setting:// 设置
-				currentIndex = 4;
+				mCurrentIndex = 4;
 				setSlideMenuTouchEnable(false);
 				break;
 			default:
@@ -175,7 +177,7 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 		}
 
 		// 给viewPager设置选中的页面
-		mPager.setCurrentItem(currentIndex);
+		mPager.setCurrentItem(mCurrentIndex);
 	}
 
 	/**
@@ -189,5 +191,19 @@ public class ContentFragment extends BaseFragment implements OnCheckedChangeList
 		MainUI ui = (MainUI) mActivity;
 		SlidingMenu menu = ui.getSlidingMenu();
 		menu.setTouchModeAbove(enable ? SlidingMenu.TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_NONE);
+	}
+
+	/**
+	 * 改变菜单对应的显示页面
+	 * 
+	 * @param mCurrentItem
+	 */
+	public void swithcMenuPager(int position)
+	{
+		// 获取当前显示的tab页面
+		TabBasePager pager = mPagerList.get(mCurrentIndex);
+
+		// 调用切换菜单
+		pager.switchMenuPager(position);
 	}
 }
