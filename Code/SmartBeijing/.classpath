@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="/SlidingMenu_lib"/>
 	<classpathentry exported="true" kind="lib" path="libs/gson-2.2.1.jar" sourcepath="F:/Android/adt-bundle-windows-x86_64-20130917/sdk/sources/android-18"/>
-	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

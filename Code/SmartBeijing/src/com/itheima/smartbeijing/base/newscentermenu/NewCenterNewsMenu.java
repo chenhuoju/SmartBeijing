@@ -6,17 +6,23 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.itheima.smartbeijing.MainUI;
 import com.itheima.smartbeijing.R;
 import com.itheima.smartbeijing.base.NewCenterBaseMenu;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterNewsItemBean;
+import com.itheima.smartbeijing.widget.TouchTabPageIndicator;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.lidroid.xutils.view.annotation.event.OnClick;
 import com.viewpagerindicator.TabPageIndicator;
 
 /**
@@ -28,19 +34,23 @@ import com.viewpagerindicator.TabPageIndicator;
  * 
  * @描述:新闻中心-->页面中-->新闻菜单中对应的内容页面
  * 
- * @SVN版本号:$Rev: 12 $
+ * @SVN版本号:$Rev: 22 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
  */
-public class NewCenterNewsMenu extends NewCenterBaseMenu
+public class NewCenterNewsMenu extends NewCenterBaseMenu implements OnPageChangeListener
 {
 
 	@ViewInject(R.id.newscenter_news_indicator)
-	private TabPageIndicator				mIndicator;
+	private TouchTabPageIndicator			mIndicator;		// 自定义的indicator
+	// private TabPageIndicator mIndicator;
 
 	@ViewInject(R.id.newscenter_news_pager)
 	private ViewPager						mPager;
+
+	@ViewInject(R.id.newscenter_news_arrow)
+	private ImageView						mIvArrow;		// 箭头
 
 	private NewsCenterMenuListBean			mMenuData;		// 菜单数据
 
@@ -81,6 +91,21 @@ public class NewCenterNewsMenu extends NewCenterBaseMenu
 
 		// 给viewPagerIndicator设置viewPager
 		mIndicator.setViewPager(mPager);
+
+		// 给viewPager设置选中监听
+		// 当viewPager和Indicator搭配使用时，要设置监听，必须设置Indicator的监听，不可以设置viewPager的监听
+		mIndicator.setOnPageChangeListener(this);
+	}
+
+	/**
+	 * 注解操作，按钮点击事件，跳转下一个条目
+	 */
+	@OnClick(R.id.newscenter_news_arrow)
+	public void clickArrow(View view)
+	{
+		// 让viewPager选中下一个
+		int item = mPager.getCurrentItem();
+		mPager.setCurrentItem(++item);
 	}
 
 	class NewPagerAdapter extends PagerAdapter
@@ -132,4 +157,37 @@ public class NewCenterNewsMenu extends NewCenterBaseMenu
 			return super.getPageTitle(position);
 		}
 	}
+
+	@Override
+	public void onPageScrollStateChanged(int position)
+	{
+
+	}
+
+	@Override
+	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+	{
+		MainUI ui = (MainUI) mContext;
+		SlidingMenu slidingMenu = ui.getSlidingMenu();
+
+		// if (position == 0)
+		// {
+		// // 当选中第一页时，slidingMenu的touchMode应该为fill_screen
+		// slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+		// }
+		// else
+		// {
+		// // 其他情况为none
+		// slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+		// }
+		// 优化之后
+		slidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu.TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_NONE);
+	}
+
+	@Override
+	public void onPageSelected(int state)
+	{
+
+	}
+
 }
