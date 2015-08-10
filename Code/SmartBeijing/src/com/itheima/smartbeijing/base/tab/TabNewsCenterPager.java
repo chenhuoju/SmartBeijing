@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import com.google.gson.Gson;
@@ -75,7 +74,7 @@ public class TabNewsCenterPager extends TabBasePager
 		if (!TextUtils.isEmpty(json))
 		{
 			// 有缓冲数据
-			Log.e(TAG, "读取本地缓存");
+			// Log.e(TAG, "读取本地缓存");
 			processData(json);
 		}
 
@@ -104,12 +103,12 @@ public class TabNewsCenterPager extends TabBasePager
 				// 取出结果值
 				String result = responseInfo.result;
 
-				Log.e(TAG, "访问网络成功:" + result);
+				// Log.e(TAG, "访问网络成功:" + result);
 
 				// 缓存数据
 				CacheUtils.setString(mContext, Constans.NEW_CENTER_URL, result);
 
-				Log.e(TAG, "读取网络缓存");
+				// Log.e(TAG, "读取网络缓存");
 
 				// 对数据进行解析，并且将结果展示到页面上
 				processData(result);
@@ -119,8 +118,8 @@ public class TabNewsCenterPager extends TabBasePager
 			@Override
 			public void onFailure(HttpException error, String msg)
 			{
-				error.printStackTrace();
-				Log.e(TAG, "访问网络成功:" + msg);
+				// error.printStackTrace();
+				// Log.e(TAG, "访问网络失败:" + msg);
 			}
 		});
 
@@ -215,7 +214,7 @@ public class TabNewsCenterPager extends TabBasePager
 	@Override
 	public void switchMenuPager(int position)
 	{
-		Log.e(TAG, "切换到第" + position + "菜单");
+		// Log.e(TAG, "切换到第" + position + "菜单");
 
 		// 清空内容的数据
 		mContentContainer.removeAllViews();

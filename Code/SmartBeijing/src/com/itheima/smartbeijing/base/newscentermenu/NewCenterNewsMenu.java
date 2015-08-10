@@ -3,19 +3,17 @@ package com.itheima.smartbeijing.base.newscentermenu;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.itheima.smartbeijing.MainUI;
 import com.itheima.smartbeijing.R;
 import com.itheima.smartbeijing.base.NewCenterBaseMenu;
+import com.itheima.smartbeijing.base.NewsListPager;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterMenuListBean;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterNewsItemBean;
 import com.itheima.smartbeijing.widget.TouchTabPageIndicator;
@@ -23,7 +21,6 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
-import com.viewpagerindicator.TabPageIndicator;
 
 /**
  * @包名:com.itheima.smartbeijing.base.newscentermenu
@@ -34,7 +31,7 @@ import com.viewpagerindicator.TabPageIndicator;
  * 
  * @描述:新闻中心-->页面中-->新闻菜单中对应的内容页面
  * 
- * @SVN版本号:$Rev: 22 $
+ * @SVN版本号:$Rev: 24 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
@@ -43,7 +40,7 @@ public class NewCenterNewsMenu extends NewCenterBaseMenu implements OnPageChange
 {
 
 	@ViewInject(R.id.newscenter_news_indicator)
-	private TouchTabPageIndicator			mIndicator;		// 自定义的indicator
+	private TouchTabPageIndicator			mIndicator;	// 自定义的indicator
 	// private TabPageIndicator mIndicator;
 
 	@ViewInject(R.id.newscenter_news_pager)
@@ -127,18 +124,27 @@ public class NewCenterNewsMenu extends NewCenterBaseMenu implements OnPageChange
 		@Override
 		public Object instantiateItem(ViewGroup container, int position)
 		{
-			// TODO:
 			NewsCenterNewsItemBean bean = mPagerDatas.get(position);
 
-			// 测试用的,页面临时显示
-			TextView tv = new TextView(mContext);
-			tv.setText(bean.title);
-			tv.setTextSize(24);
-			tv.setTextColor(Color.RED);
-			tv.setGravity(Gravity.CENTER);
+			// 测试用的,页面临时显示 TODO:
+			// TextView tv = new TextView(mContext);
+			// tv.setText(bean.title);
+			// tv.setTextSize(24);
+			// tv.setTextColor(Color.RED);
+			// tv.setGravity(Gravity.CENTER);
+			// container.addView(tv);
+			// return tv;
 
-			container.addView(tv);
-			return tv;
+			NewsListPager pager = new NewsListPager(mContext, bean);
+
+			// 加载视图
+			View view = pager.getRootView();
+			container.addView(view);
+
+			// 加载数据
+			pager.initData();
+
+			return view;
 		}
 
 		@Override
