@@ -13,13 +13,16 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.itheima.smartbeijing.R;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterNewsItemBean;
 import com.itheima.smartbeijing.bean.NewsListBean;
+import com.itheima.smartbeijing.bean.NewsListBean.NewsListPagerNewsbean;
 import com.itheima.smartbeijing.bean.NewsListBean.NewsListPagerTopnewsBean;
 import com.itheima.smartbeijing.utils.CacheUtils;
 import com.itheima.smartbeijing.utils.Constans;
@@ -41,7 +44,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 
  * @描述:新闻页面对应的list
  * 
- * @SVN版本号:$Rev: 25 $
+ * @SVN版本号:$Rev: 27 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
@@ -59,6 +62,9 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 	@ViewInject(R.id.news_list_point_container)
 	private LinearLayout					mPointContainer;		// 装点的容器
 
+	@ViewInject(R.id.news_list_item_list)
+	private ListView						mListView;				// listView
+
 	private NewsCenterNewsItemBean			mData;
 
 	private List<NewsListPagerTopnewsBean>	mPicDatas;
@@ -66,6 +72,8 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 	private BitmapUtils						mBitmapUtils;
 
 	private AutoSwitchPicTask				mSwitchPicTask;
+
+	private List<NewsListPagerNewsbean>		mNewsDatas;
 
 	public NewsListPager(Context context, NewsCenterNewsItemBean data) {
 		super(context);
@@ -82,6 +90,12 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 
 		// 注入
 		ViewUtils.inject(this, view);
+
+		View topNewsView = View.inflate(mContext, R.layout.news_top, null);
+		ViewUtils.inject(this, topNewsView);
+
+		// 给listView添加HeaderView
+		mListView.addHeaderView(topNewsView);
 
 		return view;
 	}
@@ -119,9 +133,9 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 				// Toast.makeText(mContext, result, 1).show();
 				// Log.e(TAG, "网络数据正确返回：" + result);
 
-				//存储缓存数据
+				// 存储缓存数据
 				CacheUtils.setString(mContext, url, result);
-				
+
 				// 处理数据
 				processData(result);
 			}
@@ -146,7 +160,8 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 		// 1.json串解析
 		Gson gson = new Gson();
 		NewsListBean bean = gson.fromJson(json, NewsListBean.class);
-		mPicDatas = bean.data.topnews;
+		mPicDatas = bean.data.topnews;// 获取topnews数据
+		mNewsDatas = bean.data.news;// 获取news数据
 
 		// 给viewPager加载数据-->adapter-->list
 		mPager.setAdapter(new NewsTopPicAdapter());
@@ -206,6 +221,84 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 				return false;
 			}
 		});
+
+		// TODO:给listView铺数据
+		mListView.setAdapter(new NewsAdapter());
+
+	}
+
+	/**
+	 * 自定义listView的适配器
+	 * 
+	 */
+	class NewsAdapter extends BaseAdapter
+	{
+
+		@Override
+		public int getCount()
+		{
+			if (mNewsDatas != null) { return mNewsDatas.size(); }
+			return 0;
+		}
+
+		@Override
+		public Object getItem(int position)
+		{
+			if (mNewsDatas != null) { return mNewsDatas.get(position); }
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position)
+		{
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			ViewHolder holder = null;
+
+			// TODO:
+			if (convertView == null)
+			{
+				// 没有复用
+				convertView = View.inflate(mContext, R.layout.item_news, null);
+				holder = new ViewHolder();
+
+				holder.iv_icon = (ImageView) convertView.findViewById(R.id.item_news_iv_icon);
+				holder.tv_title = (TextView) convertView.findViewById(R.id.item_news_tv_title);
+				holder.tv_time = (TextView) convertView.findViewById(R.id.item_news_tv_time);
+
+				convertView.setTag(holder);
+			}
+			else
+			{
+				// 有复用
+				holder = (ViewHolder) convertView.getTag();
+			}
+
+			NewsListPagerNewsbean bean = mNewsDatas.get(position);
+
+			// 设置标题和发布时间
+			holder.tv_title.setText(bean.title);
+			holder.tv_time.setText(bean.pubdate);
+
+			// 设置图标
+			mBitmapUtils.display(holder.iv_icon, bean.listimage);
+
+			return convertView;
+		}
+	}
+
+	/**
+	 * view持有者,复用使用的.
+	 */
+	static class ViewHolder
+	{
+		ImageView	iv_icon;
+		TextView	tv_title;
+		TextView	tv_time;
 	}
 
 	/**
@@ -215,7 +308,7 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 	 */
 	class AutoSwitchPicTask extends Handler implements Runnable
 	{
-		private final static long	DELAYED	= 2000;
+		private final static long	DELAYED	= 3000; // 切换时间(2000)
 
 		/**
 		 * 开始轮播
