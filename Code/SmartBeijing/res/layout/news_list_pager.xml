@@ -8,11 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="160dp" >
 
-        <android.support.v4.view.ViewPager
+        <com.itheima.smartbeijing.widget.HorizontalScrollViewPager
             android:id="@+id/news_list_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
-        </android.support.v4.view.ViewPager>
+        </com.itheima.smartbeijing.widget.HorizontalScrollViewPager>
 
         <TextView
             android:id="@+id/news_list_pic_title"
@@ -36,7 +36,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical"
-            android:orientation="vertical" >
+            android:orientation="horizontal" >
         </LinearLayout>
     </RelativeLayout>
 
