@@ -7,26 +7,29 @@ import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.itheima.smartbeijing.R;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterNewsItemBean;
 import com.itheima.smartbeijing.bean.NewsListBean;
-import com.itheima.smartbeijing.bean.NewsListBean.NewsListPagerNewsbean;
+import com.itheima.smartbeijing.bean.NewsListBean.NewsListPagerNewsBean;
 import com.itheima.smartbeijing.bean.NewsListBean.NewsListPagerTopnewsBean;
 import com.itheima.smartbeijing.utils.CacheUtils;
 import com.itheima.smartbeijing.utils.Constans;
 import com.itheima.smartbeijing.widget.HorizontalScrollViewPager;
+import com.itheima.smartbeijing.widget.RefreshListView;
+import com.itheima.smartbeijing.widget.RefreshListView.OnRefreshListener;
 import com.lidroid.xutils.BitmapUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
@@ -49,7 +52,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * @更新描述:TODO
  * 
  */
-public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeListener
+public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeListener, OnRefreshListener
 {
 	protected static final String			TAG	= "NewsListPager";
 
@@ -63,7 +66,8 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 	private LinearLayout					mPointContainer;		// 装点的容器
 
 	@ViewInject(R.id.news_list_item_list)
-	private ListView						mListView;				// listView
+	private RefreshListView					mListView;				// listView
+	private NewsAdapter						mNewsAdapter;			// 创建自定义适配器对象
 
 	private NewsCenterNewsItemBean			mData;
 
@@ -73,7 +77,9 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 
 	private AutoSwitchPicTask				mSwitchPicTask;
 
-	private List<NewsListPagerNewsbean>		mNewsDatas;
+	private List<NewsListPagerNewsBean>		mNewsDatas;
+
+	private String							mMoreUrl;
 
 	public NewsListPager(Context context, NewsCenterNewsItemBean data) {
 		super(context);
@@ -95,7 +101,11 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 		ViewUtils.inject(this, topNewsView);
 
 		// 给listView添加HeaderView
-		mListView.addHeaderView(topNewsView);
+		// mListView.addHeaderView(topNewsView);
+		mListView.addCustomHeaderView(topNewsView);
+
+		// 设置刷新的监听
+		mListView.setOnRefreshListener(this);
 
 		return view;
 	}
@@ -130,7 +140,6 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 			{
 				String result = responseInfo.result;
 
-				// Toast.makeText(mContext, result, 1).show();
 				// Log.e(TAG, "网络数据正确返回：" + result);
 
 				// 存储缓存数据
@@ -146,7 +155,6 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 				// Log.e(TAG, "网络数据失败返回：" + msg);
 			}
 		});
-
 	}
 
 	/**
@@ -162,6 +170,7 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 		NewsListBean bean = gson.fromJson(json, NewsListBean.class);
 		mPicDatas = bean.data.topnews;// 获取topnews数据
 		mNewsDatas = bean.data.news;// 获取news数据
+		mMoreUrl = bean.data.more;
 
 		// 给viewPager加载数据-->adapter-->list
 		mPager.setAdapter(new NewsTopPicAdapter());
@@ -222,8 +231,9 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 			}
 		});
 
-		// TODO:给listView铺数据
-		mListView.setAdapter(new NewsAdapter());
+		// 给listView铺数据
+		mNewsAdapter = new NewsAdapter();
+		mListView.setAdapter(mNewsAdapter);
 
 	}
 
@@ -259,7 +269,6 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 		{
 			ViewHolder holder = null;
 
-			// TODO:
 			if (convertView == null)
 			{
 				// 没有复用
@@ -278,7 +287,7 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 				holder = (ViewHolder) convertView.getTag();
 			}
 
-			NewsListPagerNewsbean bean = mNewsDatas.get(position);
+			NewsListPagerNewsBean bean = mNewsDatas.get(position);
 
 			// 设置标题和发布时间
 			holder.tv_title.setText(bean.title);
@@ -425,5 +434,101 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 	public void onPageScrollStateChanged(int state)
 	{
 
+	}
+
+	@Override
+	public void onRefreshing()
+	{
+		// 到网络去获取数据
+		Log.e(TAG, "正在刷新......");
+
+		final String url = Constans.SERVER_URL + mData.url;
+
+		// 从缓存先加载数据
+		String json = CacheUtils.getString(mContext, url);
+		if (!TextUtils.isEmpty(json))
+		{
+			processData(json);
+		}
+
+		HttpUtils utils = new HttpUtils();
+
+		utils.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				String result = responseInfo.result;
+
+				Log.e(TAG, "网络数据正确返回：" + result);
+
+				// 存储缓存数据
+				CacheUtils.setString(mContext, url, result);
+
+				// 处理数据
+				processData(result);
+
+				// 告诉listView该收起刷新的view
+				mListView.refreshFinish();
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				// 告诉listView该收起刷新的view
+				mListView.refreshFinish();
+			}
+		});
+	}
+
+	@Override
+	public void onLoadingMore()
+	{
+		// 去网络加载数据
+		if (TextUtils.isEmpty(mMoreUrl))
+		{
+			// 告知listView加载完成
+			mListView.refreshFinish();
+
+			Toast.makeText(mContext, "没有更多数据", 1).show();
+			return;
+		}
+
+		String url = Constans.SERVER_URL + mMoreUrl;
+
+		HttpUtils utils = new HttpUtils();
+
+		utils.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				String result = responseInfo.result;
+
+				Log.e(TAG, "网络数据正确返回：" + result);
+
+				// 给mNewsData添加数据
+				Gson gson = new Gson();
+				NewsListBean bean = gson.fromJson(result, NewsListBean.class);
+				List<NewsListPagerNewsBean> list = bean.data.news;
+				mNewsDatas.addAll(list);
+
+				// 控制数据更新，就更新一次,应为more : ""
+				mMoreUrl = bean.data.more;
+
+				// adapter刷新,即自动刷新UI
+				mNewsAdapter.notifyDataSetChanged();
+
+				// 告诉listView该收起刷新的view
+				mListView.refreshFinish();
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				// 告诉listView该收起刷新的view
+				mListView.refreshFinish();
+			}
+		});
 	}
 }

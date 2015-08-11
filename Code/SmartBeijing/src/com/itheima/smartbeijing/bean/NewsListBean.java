@@ -25,13 +25,13 @@ public class NewsListBean
 	{
 		public String							countcommenturl;
 		public String							more;
-		public List<NewsListPagerNewsbean>		news;
+		public List<NewsListPagerNewsBean>		news;
 		public String							title;
 		public List<NewsListPagerTopicBean>		topic;
 		public List<NewsListPagerTopnewsBean>	topnews;
 	}
 
-	public class NewsListPagerNewsbean
+	public class NewsListPagerNewsBean
 	{
 		public boolean	comment;
 		public String	commentlist;
