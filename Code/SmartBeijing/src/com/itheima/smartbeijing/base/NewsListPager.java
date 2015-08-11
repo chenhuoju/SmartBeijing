@@ -3,6 +3,7 @@ package com.itheima.smartbeijing.base;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -12,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -52,22 +55,24 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * @更新描述:TODO
  * 
  */
-public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeListener, OnRefreshListener
+public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeListener, OnRefreshListener, OnItemClickListener
 {
-	protected static final String			TAG	= "NewsListPager";
+	protected static final String			TAG				= "NewsListPager";
+
+	private static final String				KEY_READ_IDS	= "read_ids";
 
 	@ViewInject(R.id.news_list_pager)
-	private HorizontalScrollViewPager		mPager;				// 自定义的viewPager
+	private HorizontalScrollViewPager		mPager;							// 自定义的viewPager
 
 	@ViewInject(R.id.news_list_pic_title)
-	private TextView						mTvTitle;				// 图片title
+	private TextView						mTvTitle;							// 图片title
 
 	@ViewInject(R.id.news_list_point_container)
-	private LinearLayout					mPointContainer;		// 装点的容器
+	private LinearLayout					mPointContainer;					// 装点的容器
 
 	@ViewInject(R.id.news_list_item_list)
-	private RefreshListView					mListView;				// listView
-	private NewsAdapter						mNewsAdapter;			// 创建自定义适配器对象
+	private RefreshListView					mListView;							// listView
+	private NewsAdapter						mNewsAdapter;						// 创建自定义适配器对象
 
 	private NewsCenterNewsItemBean			mData;
 
@@ -106,6 +111,9 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 
 		// 设置刷新的监听
 		mListView.setOnRefreshListener(this);
+
+		// 给listView设置itemClick事件
+		mListView.setOnItemClickListener(this);
 
 		return view;
 	}
@@ -295,6 +303,12 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 
 			// 设置图标
 			mBitmapUtils.display(holder.iv_icon, bean.listimage);
+
+			String id = "#" + bean.id + "#";
+			String readIds = CacheUtils.getString(mContext, KEY_READ_IDS);
+			boolean isRead = !TextUtils.isEmpty(readIds) && readIds.contains(id);
+			// 设置文本text的颜色,已读状态为灰色，未读状态为黑色
+			holder.tv_title.setTextColor(isRead ? Color.GRAY : Color.BLACK);
 
 			return convertView;
 		}
@@ -530,5 +544,31 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 				mListView.refreshFinish();
 			}
 		});
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+	{
+		// 获取当前数据
+		NewsListPagerNewsBean bean = mNewsDatas.get(position - 1);
+
+		// 1.将当前的数据设置为已读
+		// 存储格式：key：固定；value：#id#,#id#
+		String readIds = CacheUtils.getString(mContext, KEY_READ_IDS);
+		if (TextUtils.isEmpty(readIds))
+		{
+			// 没有缓存数据
+			CacheUtils.setString(mContext, KEY_READ_IDS, "#" + bean.id + "#");
+		}
+		else
+		{
+			// 已经有缓冲
+			readIds += ",#" + bean.id + "#";
+			CacheUtils.setString(mContext, KEY_READ_IDS, readIds);
+		}
+		// UI刷新
+		mNewsAdapter.notifyDataSetChanged();
+
+		// 2.页面跳转
 	}
 }
