@@ -11,7 +11,7 @@ import java.util.List;
  * 
  * @描述:newslist页面的bean
  * 
- * @SVN版本号:$Rev: 24 $
+ * @SVN版本号:$Rev: 28 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 

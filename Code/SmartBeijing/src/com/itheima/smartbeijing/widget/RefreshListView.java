@@ -19,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.itheima.smartbeijing.R;
+import com.nineoldandroids.animation.ValueAnimator;
+import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
 
 /**
  * @包名:com.itheima.smartbeijing.widget
@@ -28,8 +30,8 @@ import com.itheima.smartbeijing.R;
  * 
  * @描述:下拉刷新，上拉加载
  * 
- * @SVN版本号:$Rev$
- * @更新人:$Author$
+ * @SVN版本号:$Rev: 29 $
+ * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
  */
@@ -47,7 +49,8 @@ public class RefreshListView extends ListView implements OnScrollListener
 	private int					mRefreshViewHeight;								// 刷新view的高度
 
 	private float				mDownY;											// 起始位置的坐标
-	
+	private float				mDiffY;											// 滑动的距离
+
 	private int					mCurrentState			= STATE_PULL_DOWN_REFRESH;	// 当前状态，默认值
 
 	private ProgressBar			mPBar;												// 进度
@@ -62,6 +65,7 @@ public class RefreshListView extends ListView implements OnScrollListener
 	private RotateAnimation		mDownToUpAnimation;								// 给释放刷新准备的
 	private RotateAnimation		mUpToDownAnimation;								// 给下拉刷新准备的
 	private static final long	DURATION				= 300;						// 动画持续时间
+	private static final long	ATTRIBUTEDURATION		= 500;						// 动画持续时间
 
 	public RefreshListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -170,7 +174,7 @@ public class RefreshListView extends ListView implements OnScrollListener
 			case MotionEvent.ACTION_MOVE:
 				float moveY = ev.getY();
 
-				float diffY = moveY - mDownY;
+				mDiffY = moveY - mDownY;
 
 				// 如果当前状态是正在刷新，我们就不作处理
 				if (mCurrentState == STATE_RELEASEING)
@@ -181,11 +185,11 @@ public class RefreshListView extends ListView implements OnScrollListener
 				// 获得listView的坐标
 				int[] listViewLocation = new int[2];// 0:x 1:y
 				getLocationOnScreen(listViewLocation);
-				Log.e(TAG, "listView y:" + listViewLocation[1]);
+				// Log.e(TAG, "listView y:" + listViewLocation[1]);
 
 				int[] customLocation = new int[2];
 				mCustomHeaderView.getLocationOnScreen(customLocation);
-				Log.e(TAG, "mCustomHeaderView y:" + customLocation[1]);
+				// Log.e(TAG, "mCustomHeaderView y:" + customLocation[1]);
 
 				if (customLocation[1] < listViewLocation[1])
 				{
@@ -193,19 +197,19 @@ public class RefreshListView extends ListView implements OnScrollListener
 					break;
 				}
 
-				// diffY>0:下拉
-				// diffY<0:s上拉
+				// mDiffY>0:下拉
+				// mDiffY<0:s上拉
 				// 如果第一item可见是，才可以下拉 && 往下拉
 				// int position = getFirstVisiblePosition();
-				if (getFirstVisiblePosition() == 0 && diffY > 0)
+				if (getFirstVisiblePosition() == 0 && mDiffY > 0)
 				{
 					// 给头布局设置PaddingTop
-					int hiddenHeight = (int) (mRefreshViewHeight - diffY + 0.5f);
+					int hiddenHeight = (int) (mRefreshViewHeight - mDiffY + 0.5f);
 					mHeaderLayout.setPadding(0, -hiddenHeight, 0, 0);
 
-					if (diffY < mRefreshViewHeight && mCurrentState == STATE_RELEASE_REFRESH)
+					if (mDiffY < mRefreshViewHeight && mCurrentState == STATE_RELEASE_REFRESH)
 					{
-						// diffY<mRefreshViewHeight:下拉刷新
+						// mDiffY<mRefreshViewHeight:下拉刷新
 						// 更新状态
 						mCurrentState = STATE_PULL_DOWN_REFRESH;
 
@@ -213,9 +217,9 @@ public class RefreshListView extends ListView implements OnScrollListener
 						// Log.e(TAG, "下拉刷新");
 						refreshUI();
 					}
-					else if (diffY >= mRefreshViewHeight && mCurrentState == STATE_PULL_DOWN_REFRESH)
+					else if (mDiffY >= mRefreshViewHeight && mCurrentState == STATE_PULL_DOWN_REFRESH)
 					{
-						// diffY>mRefreshViewHeight:释放刷新
+						// mDiffY>mRefreshViewHeight:释放刷新
 						mCurrentState = STATE_RELEASE_REFRESH;
 
 						// UI更新
@@ -233,17 +237,22 @@ public class RefreshListView extends ListView implements OnScrollListener
 				// 释放后的操作
 				if (mCurrentState == STATE_PULL_DOWN_REFRESH)
 				{
-					// 如果是下拉刷新状态，就隐藏刷新的view
-					mHeaderLayout.setPadding(0, -mRefreshViewHeight, 0, 0);
+					// 如果是下拉刷新状态，就隐藏刷新的view,设置得太突然
+					// mHeaderLayout.setPadding(0, -mRefreshViewHeight, 0, 0);
+					int currentPaddingTop = (int) (mDiffY - mRefreshViewHeight + 0.5f);
+					doHeaderPaddingAnimation(currentPaddingTop, -mRefreshViewHeight);
 				}
 				else if (mCurrentState == STATE_RELEASE_REFRESH)
 				{
 					// 如果是释放刷新状态，用户就希望刷新数据-->进入正在刷新状态
 					mCurrentState = STATE_RELEASEING;
 
-					// 设置PaddingTop为0
+					// 设置PaddingTop为0,设置得太突然
+					int currentPaddingTop = (int) (mDiffY - mRefreshViewHeight + 0.5f);
 
-					mHeaderLayout.setPadding(0, 0, 0, 0);
+					// mHeaderLayout.setPadding(0, currentPaddingTop, 0, 0);
+					// mHeaderLayout.setPadding(0, 0, 0, 0);
+					doHeaderPaddingAnimation(currentPaddingTop, 0);
 
 					// UI更新
 					refreshUI();
@@ -259,6 +268,53 @@ public class RefreshListView extends ListView implements OnScrollListener
 				break;
 		}
 		return super.onTouchEvent(ev);
+	}
+
+	/**
+	 * 属性动画设置方法，处理头部填充动画
+	 * 
+	 * @param start起始值
+	 * @param end结束值
+	 */
+	private void doHeaderPaddingAnimation(int start, int end)
+	{
+		ValueAnimator animator = ValueAnimator.ofInt(start, end);
+		animator.setDuration(ATTRIBUTEDURATION);
+		animator.addUpdateListener(new AnimatorUpdateListener() {
+
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation)
+			{
+				int animatedValue = (Integer) animation.getAnimatedValue();
+				mHeaderLayout.setPadding(0, animatedValue, 0, 0);
+			}
+		});
+		animator.start();
+	}
+
+	/**
+	 * 属性动画设置方法，处理尾部填充动画
+	 * 
+	 * @param start起始值
+	 * @param end结束值
+	 */
+	private void doFooterPaddingAnimation(int start, int end)
+	{
+		ValueAnimator animator = ValueAnimator.ofInt(start, end);
+		animator.setDuration(ATTRIBUTEDURATION);
+		animator.addUpdateListener(new AnimatorUpdateListener() {
+
+			@Override
+			public void onAnimationUpdate(ValueAnimator animation)
+			{
+				int animatedValue = (Integer) animation.getAnimatedValue();
+				mFooterLayout.setPadding(0, animatedValue, 0, 0);
+
+				// 自动默认选中i
+				setSelection(getAdapter().getCount());
+			}
+		});
+		animator.start();
 	}
 
 	/**
@@ -310,7 +366,8 @@ public class RefreshListView extends ListView implements OnScrollListener
 			// 上拉加载
 
 			// 隐藏加载更多的view
-			mFooterLayout.setPadding(0, -mFooterHeight, 0, 0);
+			// mFooterLayout.setPadding(0, -mFooterHeight, 0, 0);
+			doFooterPaddingAnimation(0, -mFooterHeight);
 
 			isLoadingMore = false;
 		}
@@ -323,7 +380,8 @@ public class RefreshListView extends ListView implements OnScrollListener
 			mTvUpdateTime.setText(getCurrentTimeString());
 
 			// 隐藏刷新的view
-			mHeaderLayout.setPadding(0, -mRefreshViewHeight, 0, 0);
+			// mHeaderLayout.setPadding(0, -mRefreshViewHeight, 0, 0);
+			doHeaderPaddingAnimation(0, -mRefreshViewHeight);
 
 			// 状态重置
 			mCurrentState = STATE_PULL_DOWN_REFRESH;
@@ -390,10 +448,11 @@ public class RefreshListView extends ListView implements OnScrollListener
 					Log.e(TAG, "滑动到底部");
 
 					// UI操作
-					mFooterLayout.setPadding(0, 0, 0, 0);
+					// mFooterLayout.setPadding(0, 0, 0, 0);
+					doFooterPaddingAnimation(-mFooterHeight, 0);
 
 					// 自动默认选中i
-					setSelection(getAdapter().getCount());
+					// setSelection(getAdapter().getCount());
 
 					// 是滑动到底部
 					isLoadingMore = true;
