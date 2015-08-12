@@ -28,8 +28,8 @@ import com.itheima.smartbeijing.utils.ShareUtils;
  * 
  * @描述:新闻详情页面
  * 
- * @SVN版本号:$Rev$
- * @更新人:$Author$
+ * @SVN版本号:$Rev: 33 $
+ * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
  */

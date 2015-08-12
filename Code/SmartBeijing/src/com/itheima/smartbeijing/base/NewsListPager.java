@@ -52,7 +52,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 
  * @描述:新闻页面对应的list
  * 
- * @SVN版本号:$Rev: 31 $
+ * @SVN版本号:$Rev: 33 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 

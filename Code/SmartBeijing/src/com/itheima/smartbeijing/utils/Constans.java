@@ -20,4 +20,5 @@ public interface Constans
 	// ±¾»úip:192.168.89.1(49.122.47.185)£¬ÐéÄâip:10.0.2.2
 	String	SERVER_URL		= "http://49.122.47.187:8080/zhbj";
 	String	NEW_CENTER_URL	= SERVER_URL + "/categories.json";
+	String	PHOTOS_URL	= SERVER_URL + "/photos/photos_1.json";
 }

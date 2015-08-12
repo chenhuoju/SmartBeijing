@@ -27,6 +27,7 @@ public abstract class TabBasePager implements OnClickListener
 
 	protected TextView		mTvTitle;			// title
 	protected ImageButton	mIconMenu;			// menu
+	protected ImageButton	mIconListGrid;		// list和grid的切换按钮
 	protected FrameLayout	mContentContainer;	// 内容容器
 
 	public TabBasePager(Context context) {
@@ -46,6 +47,7 @@ public abstract class TabBasePager implements OnClickListener
 		// 实现查找view
 		mTvTitle = (TextView) view.findViewById(R.id.title_bar_tv_title);
 		mIconMenu = (ImageButton) view.findViewById(R.id.title_bar_icon_menu);
+		mIconListGrid = (ImageButton) view.findViewById(R.id.title_bar_icon_list_or_grid);
 		mContentContainer = (FrameLayout) view.findViewById(R.id.tab_base_content_container);
 
 		mIconMenu.setOnClickListener(this);// 设置ImageButton监听事件
@@ -98,9 +100,11 @@ public abstract class TabBasePager implements OnClickListener
 
 	/**
 	 * 菜单切换的方法，子类如果要实现菜单切换，就需要复习这个方法
+	 * 
 	 * @param position
 	 */
 	public void switchMenuPager(int position)
 	{
 	}
+
 }

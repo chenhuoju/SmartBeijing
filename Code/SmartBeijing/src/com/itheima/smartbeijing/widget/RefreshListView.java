@@ -30,7 +30,7 @@ import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
  * 
  * @描述:下拉刷新，上拉加载
  * 
- * @SVN版本号:$Rev: 29 $
+ * @SVN版本号:$Rev: 33 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 

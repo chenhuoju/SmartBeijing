@@ -14,8 +14,8 @@ import com.itheima.smartbeijing.R;
  * 
  * @描述:TODO
  * 
- * @SVN版本号:$Rev$
- * @更新人:$Author$
+ * @SVN版本号:$Rev: 33 $
+ * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
  */

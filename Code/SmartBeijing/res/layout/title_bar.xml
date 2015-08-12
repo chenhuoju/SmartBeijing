@@ -22,7 +22,18 @@
         android:background="@android:color/transparent"
         android:src="@drawable/img_menu" />
 
-    <!-- back默认隐藏 -->
+    <ImageButton
+        android:id="@+id/title_bar_icon_list_or_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="8dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/icon_pic_list_type"
+        android:visibility="gone" />
+
+    <!-- 回退 -->
 
     <ImageButton
         android:id="@+id/title_bar_icon_back"
@@ -42,6 +53,8 @@
         android:layout_marginRight="8dp"
         android:orientation="horizontal" >
 
+        <!-- 文本设置 -->
+
         <ImageButton
             android:id="@+id/title_bar_icon_textsize"
             android:layout_width="wrap_content"
@@ -50,6 +63,8 @@
             android:background="@android:color/transparent"
             android:src="@drawable/icon_textsize"
             android:visibility="gone" />
+
+        <!-- 分享 -->
 
         <ImageButton
             android:id="@+id/title_bar_icon_share"

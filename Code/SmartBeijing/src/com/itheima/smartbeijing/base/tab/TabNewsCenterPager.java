@@ -188,10 +188,10 @@ public class TabNewsCenterPager extends TabBasePager
 		switchMenuPager(0);
 	}
 
-	/**
-	 * 设置内容区域视图的展示---->测试使用的
-	 * 
-	 */
+	// /**
+	// * 设置内容区域视图的展示---->测试使用的
+	// *
+	// */
 	// private void switchPager(int i)
 	// {
 	// // 清空内容的数据
@@ -232,5 +232,19 @@ public class TabNewsCenterPager extends TabBasePager
 		// 加载数据
 		menuPager.initData();
 
+		// 判断是否是组团页面
+		if (menuPager instanceof NewCenterPicMenu)
+		{
+			// 组图页面
+			// 显示切换菜单
+			mIconListGrid.setVisibility(View.VISIBLE);
+
+			((NewCenterPicMenu) menuPager).setSwitchButton(mIconListGrid);
+		}
+		else
+		{
+			// 不显示切换菜单
+			mIconListGrid.setVisibility(View.GONE);
+		}
 	}
 }
