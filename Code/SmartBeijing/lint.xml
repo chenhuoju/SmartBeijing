@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="FloatMath" severity="ignore" />
     <issue id="HandlerLeak" severity="ignore" />
     <issue id="NewApi" severity="ignore">
         <ignore path="src/com/itheima/wisdombeijing/GuideUI.java" />
     </issue>
+    <issue id="SdCardPath" severity="ignore" />
+    <issue id="SetJavaScriptEnabled" severity="ignore" />
     <issue id="ShowToast" severity="ignore">
         <ignore path="src/com/itheima/smartbeijing/base/tab/TabNewsCenterPager.java" />
     </issue>

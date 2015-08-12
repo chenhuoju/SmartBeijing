@@ -65,7 +65,6 @@ public class RefreshListView extends ListView implements OnScrollListener
 	private RotateAnimation		mDownToUpAnimation;								// 给释放刷新准备的
 	private RotateAnimation		mUpToDownAnimation;								// 给下拉刷新准备的
 	private static final long	DURATION				= 300;						// 动画持续时间
-	private static final long	ATTRIBUTEDURATION		= 500;						// 动画持续时间
 
 	public RefreshListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -279,7 +278,7 @@ public class RefreshListView extends ListView implements OnScrollListener
 	private void doHeaderPaddingAnimation(int start, int end)
 	{
 		ValueAnimator animator = ValueAnimator.ofInt(start, end);
-		animator.setDuration(ATTRIBUTEDURATION);
+		animator.setDuration(DURATION);
 		animator.addUpdateListener(new AnimatorUpdateListener() {
 
 			@Override
@@ -301,7 +300,7 @@ public class RefreshListView extends ListView implements OnScrollListener
 	private void doFooterPaddingAnimation(int start, int end)
 	{
 		ValueAnimator animator = ValueAnimator.ofInt(start, end);
-		animator.setDuration(ATTRIBUTEDURATION);
+		animator.setDuration(DURATION);
 		animator.addUpdateListener(new AnimatorUpdateListener() {
 
 			@Override

@@ -3,6 +3,7 @@ package com.itheima.smartbeijing.base;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.itheima.smartbeijing.NewsDetailUI;
 import com.itheima.smartbeijing.R;
 import com.itheima.smartbeijing.bean.NewsCenterBean.NewsCenterNewsItemBean;
 import com.itheima.smartbeijing.bean.NewsListBean;
@@ -50,7 +52,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 
  * @描述:新闻页面对应的list
  * 
- * @SVN版本号:$Rev: 28 $
+ * @SVN版本号:$Rev: 31 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
@@ -570,5 +572,8 @@ public class NewsListPager extends NewCenterBaseMenu implements OnPageChangeList
 		mNewsAdapter.notifyDataSetChanged();
 
 		// 2.页面跳转
+		Intent intent = new Intent(mContext, NewsDetailUI.class);
+		intent.putExtra(NewsDetailUI.KEY_URL, bean.url);// 传递地址
+		mContext.startActivity(intent);
 	}
 }
