@@ -22,7 +22,7 @@ import com.itheima.smartbeijing.bean.NewsListBean;
 import com.itheima.smartbeijing.bean.NewsListBean.NewsListPagerNewsBean;
 import com.itheima.smartbeijing.utils.CacheUtils;
 import com.itheima.smartbeijing.utils.Constans;
-import com.lidroid.xutils.BitmapUtils;
+import com.itheima.smartbeijing.utils.ImageHelper;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -41,7 +41,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 
  * @描述:新闻中心-->页面中-->组图菜单中对应的内容页面
  * 
- * @SVN版本号:$Rev: 14 $
+ * @SVN版本号:$Rev: 37 $
  * @更新人:$Author: chj $
  * @更新描述:TODO
  * 
@@ -60,7 +60,8 @@ public class NewCenterPicMenu extends NewCenterBaseMenu implements OnClickListen
 
 	private List<NewsListPagerNewsBean>	mNewsDatas;							// 新闻数据
 
-	private BitmapUtils					mBitmapUtils;
+	// private BitmapUtils mBitmapUtils;//别人封装的xUtils来处理图片显示
+	private ImageHelper					mHelper;								// 自己封装的类来处理图片显示
 
 	private ImageButton					mIbListOrGrid;
 	private boolean						isGrid;								// 默认是listView显示
@@ -70,7 +71,8 @@ public class NewCenterPicMenu extends NewCenterBaseMenu implements OnClickListen
 	public NewCenterPicMenu(Context context) {
 		super(context);
 
-		mBitmapUtils = new BitmapUtils(mContext);
+		// mBitmapUtils = new BitmapUtils(mContext);
+		mHelper = new ImageHelper(context);
 	}
 
 	@Override
@@ -198,7 +200,8 @@ public class NewCenterPicMenu extends NewCenterBaseMenu implements OnClickListen
 			holder.tv_title.setText(bean.title);
 
 			// 图片显示
-			mBitmapUtils.display(holder.iv_photo, bean.listimage);
+			// mBitmapUtils.display(holder.iv_photo, bean.listimage);
+			mHelper.display(holder.iv_photo, bean.listimage);
 
 			return convertView;
 		}
